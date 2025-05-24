@@ -1,0 +1,128 @@
+-- LocalScript (placed in StarterGui)
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui", player.PlayerGui)
+
+-- Main frame setup (smaller rectangular size)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 220, 0, 100)  -- Smaller size (width: 220, height: 100)
+mainFrame.Position = UDim2.new(0.5, -110, 0.5, -50)  -- Centered on screen
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  -- Default fallback color
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Neon Galaxy Background: Using a UIGradient for a vibrant, colorful effect
+local gradient = Instance.new("UIGradient", mainFrame)
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),  -- Neon pink
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(0, 255, 255)),  -- Neon cyan
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 0, 255)),  -- Neon blue
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(255, 0, 255)),  -- Neon pink
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(128, 0, 128)),  -- Purple
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))   -- White for a star-like highlight
+})
+gradient.Rotation = 45  -- Angling the gradient for better visual flow
+
+-- Rounded corners for main frame
+local mainFrameCorner = Instance.new("UICorner", mainFrame)
+mainFrameCorner.CornerRadius = UDim.new(0, 12)
+
+-- Rainbow frame stroke (instead of corner and moving effect)
+local rainbowStroke = Instance.new("UIStroke")
+rainbowStroke.Thickness = 5  -- Set thickness of the stroke
+rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border  -- Apply the stroke around the border
+rainbowStroke.Parent = mainFrame
+
+-- Function to create a rainbow effect for the frame's border
+local function updateRainbowStroke()
+    local hue = tick() % 6 / 6  -- This will cycle the hue value through 0 to 1, creating a rainbow effect
+    rainbowStroke.Color = Color3.fromHSV(hue, 1, 1)  -- Set the color of the stroke using the hue
+end
+
+-- Update the rainbow effect continuously
+game:GetService("RunService").Heartbeat:Connect(updateRainbowStroke)
+
+-- Draggable functionality
+local dragging, dragStart, startPos
+local function onDragStart(input) dragging, dragStart, startPos = true, input.Position, mainFrame.Position end
+local function onDrag(input)
+    if dragging then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end
+mainFrame.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then onDragStart(input) end end)
+mainFrame.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then onDrag(input) end end)
+mainFrame.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
+
+-- Title setup (larger text, adjusted size)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0, 200, 0, 40)  -- Increased width for title
+title.Position = UDim2.new(0.5, -100, 0.5, -35)  -- Positioned higher on the frame
+title.Text = "ZrSpace Hub"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)  -- White text
+title.BackgroundTransparency = 1  -- Transparent background
+title.TextSize = 24  -- Larger text size
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = mainFrame
+
+-- Button setup (slightly smaller, fits inside frame)
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 180, 0, 35)  -- Reduced button size (width: 180, height: 35)
+button.Position = UDim2.new(0.5, -90, 0.5, 10)  -- Positioned below the title and centered
+button.Text, button.BackgroundColor3, button.TextColor3, button.TextScaled, button.Font = "Spawn Fish", Color3.fromRGB(0, 200, 255), Color3.fromRGB(255, 255, 255), true, Enum.Font.GothamBold
+button.BorderSizePixel, button.Parent = 0, mainFrame
+local buttonCorner = Instance.new("UICorner", button)
+buttonCorner.CornerRadius = UDim.new(0, 8)
+
+-- Hover effect for button
+button.MouseEnter:Connect(function() button.BackgroundColor3 = Color3.fromRGB(0, 150, 255) end)
+button.MouseLeave:Connect(function() button.BackgroundColor3 = Color3.fromRGB(0, 200, 255) end)
+
+-- Warning and game freeze setup
+local function showReloadingMessage()
+    -- Apply blur effect to the screen
+    local blurEffect = Instance.new("BlurEffect")
+    blurEffect.Size = 25  -- Intensity of the blur
+    blurEffect.Parent = game.Lighting  -- Add to Lighting to affect the whole screen
+
+    -- Freeze the player by blocking all interactions
+    local player = game.Players.LocalPlayer
+    local mouse = player:GetMouse()
+    local originalMouseIcon = mouse.Icon  -- Store the original mouse icon
+    mouse.Icon = ""  -- Hide the mouse icon to indicate freeze
+
+    -- Display "RELOADING.." message
+    local reloadMessage = Instance.new("TextLabel")
+    reloadMessage.Size = UDim2.new(0, 400, 0, 100)  -- Large message size
+    reloadMessage.Position = UDim2.new(0.5, -200, 0.5, -50)  -- Centered on screen
+    reloadMessage.Text = "RELOADING..."
+    reloadMessage.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Red color for warning
+    reloadMessage.BackgroundTransparency = 1  -- Transparent background
+    reloadMessage.TextSize = 36  -- Large text size
+    reloadMessage.TextScaled = true
+    reloadMessage.Font = Enum.Font.GothamBold
+    reloadMessage.Parent = screenGui
+
+    -- Rainbow effect for "RELOADING..."
+    local function updateRainbowText()
+        local hue = tick() % 6 / 6  -- This will cycle the hue value through 0 to 1, creating a rainbow effect
+        reloadMessage.TextColor3 = Color3.fromHSV(hue, 1, 1)  -- Set the color of the text using the hue
+    end
+
+    -- Update the rainbow text continuously
+    game:GetService("RunService").Heartbeat:Connect(updateRainbowText)
+
+    -- Freeze the game for 30 seconds
+    wait(30)
+
+    -- Unfreeze the player (allow interactions again)
+    mouse.Icon = originalMouseIcon  -- Restore original mouse icon
+    blurEffect:Destroy()  -- Remove blur effect
+    reloadMessage:Destroy()  -- Remove "RELOADING.." message
+end
+
+-- Button click event
+button.MouseButton1Click:Connect(function()
+    showReloadingMessage()  -- Show the reloading message and freeze the screen
+end)
