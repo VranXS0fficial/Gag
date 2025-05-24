@@ -58,7 +58,7 @@ mainFrame.InputEnded:Connect(function(input) if input.UserInputType == Enum.User
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(0, 200, 0, 40)  -- Increased width for title
 title.Position = UDim2.new(0.5, -100, 0.5, -35)  -- Positioned higher on the frame
-title.Text = "ZrSpace Hub"
+title.Text = "VranXs Hub"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)  -- White text
 title.BackgroundTransparency = 1  -- Transparent background
 title.TextSize = 24  -- Larger text size
@@ -70,7 +70,7 @@ title.Parent = mainFrame
 local button = Instance.new("TextButton")
 button.Size = UDim2.new(0, 180, 0, 35)  -- Reduced button size (width: 180, height: 35)
 button.Position = UDim2.new(0.5, -90, 0.5, 10)  -- Positioned below the title and centered
-button.Text, button.BackgroundColor3, button.TextColor3, button.TextScaled, button.Font = "Spawn Fish", Color3.fromRGB(0, 200, 255), Color3.fromRGB(255, 255, 255), true, Enum.Font.GothamBold
+button.Text, button.BackgroundColor3, button.TextColor3, button.TextScaled, button.Font = "Start Duping", Color3.fromRGB(0, 200, 255), Color3.fromRGB(255, 255, 255), true, Enum.Font.GothamBold
 button.BorderSizePixel, button.Parent = 0, mainFrame
 local buttonCorner = Instance.new("UICorner", button)
 buttonCorner.CornerRadius = UDim.new(0, 8)
